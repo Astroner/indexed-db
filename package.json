@@ -1,0 +1,16 @@
+{
+  "name": "@dogonis/db",
+  "version": "0.0.1",
+  "description": "Abstraction over indexedDB",
+  "main": "lib/index.js",
+  "author": "zhenyanikforov@gmail.com",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "dev": "parcel dev/index.html"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.5",
+    "typescript": "^4.9.4"
+  }
+}

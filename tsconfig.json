@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "alwaysStrict": true,
+        "strict": true,
+        "lib": [
+            "ESNext",
+            "dom",
+        ],
+        "declaration": true,
+        "isolatedModules": true,
+        "target": "ES5",
+        "outDir": "lib"
+    },
+    "include": [
+        "src",
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}
