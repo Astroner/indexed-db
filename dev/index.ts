@@ -1,12 +1,35 @@
-import { DB, DBColumn, DBModel, DBSTable, DBTable, DBRequest } from "../src";
+import { DB, DBColumn, DBModel, DBSTable, DBTable } from "../src";
+
+type Category = "cooking" | "anime";
 
 const model = DBModel
     .create({
-        ss: new DBTable({
-            a: new DBColumn<{ a: number }>(),
-            b: new DBColumn<string>(),
+        items: new DBTable({
+            name: new DBColumn<string, true>(true, true),
+            category: new DBColumn<Category, true>(true),
         }),
-        aa: new DBSTable<string>(),
+        categories: new DBTable({
+            name: new DBColumn<Category, true>(true, true),
+        }),
     })
 
 const db = new DB('test', model);
+
+(async () => {
+    const categories = await db.getAll("categories");
+
+    const categoryItems = await Promise.all(categories.map(async ({ name }) => {
+        const items = await db.getAllBy("items", "category", name);
+
+        return {
+            name,
+            count: items.length,
+            items: items.map(item => ({
+                id: item.key,
+                name: item.value.name
+            })),
+        }
+    }))
+
+    console.log(categoryItems)
+})()

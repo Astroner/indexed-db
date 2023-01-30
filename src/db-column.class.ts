@@ -1,6 +1,7 @@
-export class DBColumn<T, Unique extends boolean = false> {
+export class DBColumn<T, Indexable extends boolean = false> {
     type!: T;
     constructor(
-        public unique: Unique = (false as any)
+        public indexable: Indexable = (false as Indexable),
+        public unique: Indexable extends true ? boolean : never = (false as any),
     ){}
 }

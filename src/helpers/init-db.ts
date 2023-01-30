@@ -80,9 +80,11 @@ export const initDB = (
                         autoIncrement: true,
                     })
                     for(const [columnName, column] of Object.entries(table.columns)) {
-                        storage.createIndex(columnName, columnName, {
-                            unique: column.unique,
-                        })
+                        if(column.indexable) {
+                            storage.createIndex(columnName, columnName, {
+                                unique: column.unique,
+                            })
+                        }
                     }
                 } else {
                     db.createObjectStore(key, {

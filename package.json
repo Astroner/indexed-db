@@ -7,6 +7,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
+    "ts-check": "tsc --noEmit",
     "dev": "parcel dev/index.html"
   },
   "devDependencies": {
