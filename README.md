@@ -67,8 +67,8 @@ const deleteItem = async (key: string) => {
 Basically each method represents specific operation and takes table name as the first argument.
 
 ### Migration
-Unfortunately we can't just add new fields to the model or modify existing ones, we have to create a new model from previous.
-**DBModel** provides 2 methods to do so: **next()** and **extend()**:
+Unfortunately we can't just add new fields to the model or modify existing ones, we have to create a new model from the previous.
+**DBModel** provides 2 methods to do so: **next()** and **extend()**.s
 
 #### Next
 Simply creates new model from previous and provides migration function:
@@ -115,7 +115,7 @@ const model = DBModel
         })
     )
 ``` 
-Here we just added new table categories, but it doesn't mean that we only can add, we also can override:
+Here we just added new *categories* table, but it doesn't mean that we only can add, we also can override:
 ```ts
 const model = DBModel
     .create({
@@ -169,7 +169,7 @@ const model = DBModel.create({
 })
 ```
 Here we have to not only pass **true** to the **constructor** but also add second generic argument, because we need to save type data.
-If **autoKey** then **DB** will change key type for this table from **string** to **number** and will set it automatically, which also means that we cant use **DB.put()** method, because it only works with **string** keys.
+If **autoKey** is provided then **DB** will change key type for this table from **string** to **number** and will set keys automatically, which also means that we cant use **DB.put()** method, because it only works with **string** keys.
 
 ```ts
 const model = DBModel.create({
