@@ -1,5 +1,5 @@
 # Hi there
-This is simple abstraction over indexedDB based on classes, tables and columns.
+This is a simple abstraction over indexedDB based on classes, tables and columns.
 
 # Table of content
  - [Basics](#basics)
