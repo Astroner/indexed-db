@@ -1,16 +1,27 @@
 {
   "name": "@dogonis/db",
   "version": "0.0.1",
-  "description": "Abstraction over indexedDB",
+  "description": "Simple library for indexedDB",
   "main": "lib/index.js",
   "author": "zhenyanikforov@gmail.com",
   "license": "MIT",
   "scripts": {
     "build": "tsc",
     "ts-check": "tsc --noEmit",
-    "dev": "parcel dev/index.html"
+    "dev": "parcel dev/index.html",
+    "prepublishOnly": "npm run clear && npm run build",
+    "clear": "del lib --force"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Astroner/indexed-db"
+  },
+  "keywords": [
+    "typescript",
+    "indexedDB"
+  ],
   "devDependencies": {
+    "del-cli": "^5.0.0",
     "parcel-bundler": "^1.12.5",
     "typescript": "^4.9.4"
   }
