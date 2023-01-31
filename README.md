@@ -15,6 +15,7 @@ This is a simple abstraction over indexedDB based on classes, tables and columns
     - [DBTable](#dbtable)
     - [Utility types](#utility-types)
        - [DBTablesName](#dbtablesname)
+       - [DBTablesType](#dbtablestype)
 
 
 # Basics
