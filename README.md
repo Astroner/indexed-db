@@ -13,6 +13,8 @@ This is a simple abstraction over indexedDB based on classes, tables and columns
  - [Advanced](#advanced)
     - [DBSTable](#dbstable)
     - [DBTable](#dbtable)
+    - [Utility types](#utility-types)
+       - [DBTablesName](#dbtablesname)
 
 
 # Basics
@@ -226,4 +228,37 @@ const test = async () => {
 
     const elrics = await db.getAllBy('characters', 'surname', 'elric');
 }
+```
+
+### Utility types
+This section is about type utilities
+
+#### DBTablesName
+Type of DB tables name:
+```ts
+import { DB, DBModel, DBSTable, DBTablesName } from '@dogonis/db';
+
+const db = new DB('db-name', new DBModel({
+    a: new DBSTable<string>(),
+    b: new DBSTable<number>(),
+}))
+
+type Tables = DBTablesName<typeof db>; // "a" | "b"
+```
+
+#### DBTablesType
+Type of DB tables:
+```ts
+import { DB, DBModel, DBSTable, DBTablesType } from '@dogonis/db';
+
+const db = new DB('db-name', new DBModel({
+    a: new DBSTable<string>(),
+    b: new DBSTable<number>(),
+}))
+
+type Types = DBTablesType<typeof db>;
+
+type AType = Types['a'] // string;
+type BType = Types['b'] // number;
+
 ```

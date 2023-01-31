@@ -1,7 +1,8 @@
-import { DBTable, DBTableBasicColumns, DBTableType } from "./db-table.class";
+import { DBTable, DBTableBasicColumns } from "./db-table.class";
 import { DBSTable } from "./db-s-table.class";
+import { DBTableType } from "./utility-types/db-table-type";
 
-export type ExtendTable<
+type ExtendTable<
     Origin extends Record<string, any>,
     Extend extends Record<string, any>,
 > = Omit<Origin, keyof Extend> & Extend;
@@ -11,7 +12,7 @@ export type DBModelBasicTables = Record<
     DBTable<DBTableBasicColumns> | DBSTable<any, boolean>
 >;
 
-export type TablesType<Tables extends DBModelBasicTables> = {
+type TablesType<Tables extends DBModelBasicTables> = {
     [K in keyof Tables]: Array<{ 
         key: 
             Tables[K] extends DBTable<DBTableBasicColumns>

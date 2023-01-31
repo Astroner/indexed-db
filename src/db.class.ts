@@ -12,10 +12,12 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
     static drop(name: string) {
         indexedDB.deleteDatabase(name);
     }
-
+    
     private storage: Promise<IDBDatabase>;
 
-    constructor(name: string, model: Model){
+    private subs = new Array<(table: keyof Model['tables']) => void>();
+
+    constructor(public name: string, public model: Model){
         this.storage = initDB(name, model);
     }
 
@@ -41,7 +43,9 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
     async put<K extends keyof KeyTablesOnly<Model>>(table: K, key: string, value: KeyTablesOnly<Model>[K]['type']){
         const store = await this.getObjectStore(table as string, "readwrite");
 
-        return promisifyRequest(store.put(value, key));
+        await promisifyRequest(store.put(value, key));
+
+        this.update(table);
     }
 
     /**
@@ -73,6 +77,8 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
         const store = await this.getObjectStore(table as string, "readwrite");
 
         await promisifyRequest(store.add(value, key ?? undefined));
+
+        this.update(table);
     }
 
     /**
@@ -123,6 +129,8 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
         const store = await this.getObjectStore(table as string, "readwrite");
 
         await promisifyRequest(store.delete(key as string));
+
+        this.update(table);
     }
 
     /**
@@ -133,7 +141,9 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
     async clear<K extends keyof Model['tables']>(table: K) {
         const store = await this.getObjectStore(table as string, "readwrite");
 
-        await promisifyRequest(store.clear())
+        await promisifyRequest(store.clear());
+        
+        this.update(table);
     }
 
     /**
@@ -203,6 +213,22 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
         })
     }
 
+    subscribe(sub: (table: keyof Model['tables']) => void) {
+        this.subs.push(sub);
+
+        return {
+            unsubscribe: () => {
+                this.subs.splice(this.subs.indexOf(sub), 1);
+            }
+        }
+    }
+
+    private update(table: keyof Model['tables']) {
+        for(const sub of this.subs) {
+            sub(table);
+        }
+    }
+    
     private async getObjectStore(table: string, mode: "readonly" | "readwrite") {
         const storage = await this.storage;
 

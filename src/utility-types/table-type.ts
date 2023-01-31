@@ -1,6 +1,7 @@
 import { DBModel, DBModelBasicTables } from "../db-model.class";
 import { DBSTable } from "../db-s-table.class";
-import { DBTable, DBTableBasicColumns, DBTableType } from "../db-table.class";
+import { DBTable, DBTableBasicColumns } from "../db-table.class";
+import { DBTableType } from "./db-table-type";
 
 export type TableType<
     Model extends DBModel<DBModelBasicTables, any>, 

@@ -1,4 +1,4 @@
-import { DB, DBColumn, DBModel, DBSTable, DBTable } from "../src";
+import { DB, DBColumn, DBModel, DBSTable, DBTable, DBTablesName, DBTablesType } from "../src";
 
 type Category = "cooking" | "anime";
 
@@ -33,3 +33,13 @@ const db = new DB('test', model);
 
     console.log(categoryItems)
 })()
+
+db.subscribe((table) => {
+    console.log(table);
+})
+
+type Keys = DBTablesName<typeof db>;
+
+type Types = DBTablesType<typeof db>;
+
+type CategoryT = Types['categories'];
