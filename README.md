@@ -243,7 +243,7 @@ const test = async () => {
 ### Listen for DB updates
 Here we will describe methods to subscribe for DB updates.
 #### DB subscription
-**DB** class has **subscribe()** method which can be used to register listeners. The listener will receive table name that was updated, after add/put/delete methods were called.
+**DB** class has **subscribe()** method which can be used to register listeners. The listener will receive table name that was updated, after add/put/update/delete/clear methods were called.
 Also **DB.subscribe()** returns subscription with **unsubscribe()** method.
 
 Example:

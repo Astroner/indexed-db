@@ -46,7 +46,7 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
 
         await promisifyRequest(store.put(value, key));
 
-        this.update(table);
+        this.sendUpdate(table);
     }
 
     /**
@@ -79,7 +79,7 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
 
         await promisifyRequest(store.add(value, key ?? undefined));
 
-        this.update(table);
+        this.sendUpdate(table);
     }
 
     /**
@@ -131,6 +131,27 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
             cursorRequest.onerror = reject;
         })
     }
+    
+    /**
+     * 
+     * @param table Table name
+     * @param key Table item key
+     * @param next new value
+     * 
+     * @description Updates table item by key. Will throw Error("CANNOT_UPDATE") if item with provided key doesn't exists
+     */
+    async update<K extends keyof Model['tables']>(table: K, key: TableKey<Model, K>, next: TableType<Model, K>){
+        const store = await this.getObjectStore(table as string, "readwrite");
+
+        const item = !!(await promisifyRequest(store.get(key as string)));
+
+        if(!item) throw new Error("CANNOT_UPDATE");
+
+        await promisifyRequest(store.put(next, key as any));
+        
+        this.sendUpdate(table);
+    }
+
 
     /**
      * 
@@ -142,7 +163,7 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
 
         await promisifyRequest(store.delete(key as string));
 
-        this.update(table);
+        this.sendUpdate(table);
     }
 
     /**
@@ -155,7 +176,7 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
 
         await promisifyRequest(store.clear());
         
-        this.update(table);
+        this.sendUpdate(table);
     }
 
     /**
@@ -225,12 +246,6 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
         })
     }
 
-    async deleteBy() {
-        const store = await this.getObjectStore("AA", "readwrite");
-
-
-    }
-
     subscribe(sub: (table: keyof Model['tables']) => void) {
         this.subs.push(sub);
 
@@ -241,7 +256,7 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
         }
     }
 
-    private update(table: keyof Model['tables']) {
+    private sendUpdate(table: keyof Model['tables']) {
         for(const sub of this.subs) {
             sub(table);
         }

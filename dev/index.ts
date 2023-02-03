@@ -35,6 +35,6 @@ const db = new DB('test', model);
 
 window['db'] = db;
 
-const obs = new DBObservable(db, "items");
+const obs = new DBObservable(db, "categories");
 
 obs.subscribe(console.log)
