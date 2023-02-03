@@ -8,3 +8,5 @@ export * from './db-model.class'
 export * from './db.class'
 
 export * from './db-utility-types'
+
+export * from './db-observable.class'

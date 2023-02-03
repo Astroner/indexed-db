@@ -1,4 +1,4 @@
-import { DB, DBColumn, DBModel, DBSTable, DBTable, DBTablesName, DBTablesType } from "../src";
+import { DB, DBColumn, DBModel, DBObservable, DBSTable, DBTable, DBTablesName, DBTablesType } from "../src";
 
 type Category = "cooking" | "anime";
 
@@ -12,34 +12,29 @@ const model = DBModel
             name: new DBColumn<Category, true>(true, true),
         }),
     })
+    .extend(
+        {
+            items: new DBTable({
+                name: new DBColumn<string, true>(true, true),
+                category: new DBColumn<number, true>(true),
+            })
+        },
+        (prev) => ({
+            categories: prev.categories,
+            items: prev.items.map(item => ({
+                key: item.key,
+                value: {
+                    name: item.value.name,
+                    category: prev.categories.find(cat => cat.value.name === item.value.category)?.key ?? 0
+                }
+            }))
+        })
+    )
 
 const db = new DB('test', model);
 
-(async () => {
-    const categories = await db.getAll("categories");
+window['db'] = db;
 
-    const categoryItems = await Promise.all(categories.map(async ({ name }) => {
-        const items = await db.getAllBy("items", "category", name);
+const obs = new DBObservable(db, "items");
 
-        return {
-            name,
-            count: items.length,
-            items: items.map(item => ({
-                id: item.key,
-                name: item.value.name
-            })),
-        }
-    }))
-
-    console.log(categoryItems)
-})()
-
-db.subscribe((table) => {
-    console.log(table);
-})
-
-type Keys = DBTablesName<typeof db>;
-
-type Types = DBTablesType<typeof db>;
-
-type CategoryT = Types['categories'];
+obs.subscribe(console.log)

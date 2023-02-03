@@ -22,6 +22,7 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
     }
 
     async disconnect(){
+        this.subs = [];
         const storage = await this.storage;
 
         storage.close()
@@ -79,6 +80,17 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
         await promisifyRequest(store.add(value, key ?? undefined));
 
         this.update(table);
+    }
+
+    /**
+     * 
+     * @param table Table name
+     * @returns count of items in the table
+     */
+    async count<K extends keyof Model['tables']>(table: K): Promise<number> {
+        const store = await this.getObjectStore(table as string, "readwrite");
+
+        return promisifyRequest(store.count());
     }
 
     /**
@@ -211,6 +223,12 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
             }
             cursorReq.onerror = reject;
         })
+    }
+
+    async deleteBy() {
+        const store = await this.getObjectStore("AA", "readwrite");
+
+
     }
 
     subscribe(sub: (table: keyof Model['tables']) => void) {

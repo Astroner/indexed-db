@@ -1,5 +1,6 @@
 # Hi there
-This is a simple abstraction over indexedDB based on classes, tables and columns.
+This is a simple abstraction over indexedDB based on classes with opportunity to automate version migrations.
+
 
 # Table of content
  - [Basics](#basics)
@@ -13,6 +14,9 @@ This is a simple abstraction over indexedDB based on classes, tables and columns
  - [Advanced](#advanced)
     - [DBSTable](#dbstable)
     - [DBTable](#dbtable)
+    - [Listen for DB updates](#listen-for-db-updates)
+       - [DB subscription](#db-subscription)
+       - [DBObservable](#dbobservable)
     - [Utility types](#utility-types)
        - [DBTablesName](#dbtablesname)
        - [DBTablesType](#dbtablestype)
@@ -31,6 +35,7 @@ const model = DBModel.create({
 **DBModel.create(tables)** returns initial DB model based on tables it got. In the example above **DBSTable** is used as table type. 
 **DBSTable** stands for *Database Simple Table*. *Simple* here means that it's just a key-value storage. The only generic argument here is a type of the table data, keys are always strings.
 
+
 ### DB
 So, we have Model now we can create DB:
 ```ts
@@ -39,6 +44,7 @@ import { DB } from '@dogonis/db'
 const db = new DB('db-name', model);
 ```
 Actual DB interface is implemented by **DB** class. It takes database name and model.
+
 
 ### Basic operations
 Lets try some simple operations like add, get and delete:
@@ -69,10 +75,10 @@ const deleteItem = async (key: string) => {
 ```
 Basically each method represents specific operation and takes table name as the first argument.
 
+
 ### Migration
 Unfortunately we can't just add new fields to the model or modify existing ones, we have to create a new model from the previous.
-**DBModel** provides 2 methods to do so: **next()** and **extend()**.s
-
+**DBModel** provides 2 methods to do so: **next()** and **extend()**.
 #### Next
 Simply creates new model from previous and provides migration function:
 ```ts
@@ -92,6 +98,7 @@ const model = DBModel
 const db = new DB('db-name', model);
 ```
 As you can see we can(and it's recommended) just chain methods to change Database model, **DB** class will automatically evaluate state from previous versions using provided migration functions.
+
 
 #### Extend
 Does exactly what **next()** does, but takes previous model as basis:
@@ -184,6 +191,7 @@ const db = new DB('db-name', model);
 db.add("withNumbers", null, "test-string")
 ```
 
+
 ### DBTable
 Moving on from *Simple* table to *Normal* table or **DBTable**:
 ```ts
@@ -207,7 +215,7 @@ const model = DBModel.create({
 })
 ```
 Above we added *nickname* column as `new DBColumn<string, true>(true, true)`, second **true** means that this field is not only indexable, but also unique.
-Now we can use **DB.getBy()** and **DB.getAllBy()** to search data:
+Now we can use **DB.getBy()** and **DB.getAllBy()** to search data by nickname and surname:
 ```ts
 const model = DBModel.create({
     characters: new DBTable({
@@ -231,9 +239,63 @@ const test = async () => {
 }
 ```
 
-### Utility types
-This section is about type utilities
 
+### Listen for DB updates
+Here we will describe methods to subscribe for DB updates.
+#### DB subscription
+**DB** class has **subscribe()** method which can be used to register listeners. The listener will receive table name that was updated, after add/put/delete methods were called.
+Also **DB.subscribe()** returns subscription with **unsubscribe()** method.
+
+Example:
+```ts
+import { DB, DBModel, DBSTable } from '@dogonis/db';
+
+const db = new DB('db-name', new DBModel({
+    a: new DBSTable<string>(),
+    b: new DBSTable<number>(),
+}))
+
+db.subscribe((tableName) => console.log(`Table '${tableName}' updated`));
+
+db.add("a", "foo", "bar"); // console:   Table 'a' updated
+db.add("b", "foo", 3);     // console:   Table 'b' updated
+```
+
+
+#### DBObservable
+**DBObservable** is a class that represents state of specified table. 
+**DBObservable** takes **DB** it should listen to and table name.
+```ts
+import { DB, DBModel, DBTable, DBObservable } from '@dogonis/db';
+
+const db = new DB('db-name', new DBModel({
+    items: new DBTable({
+        name: DBColumn<string, true>(true, true),
+        count: DBColumn<number>(),
+    }),
+}))
+
+const items$ = new DBObservable(db, "items");
+
+const subscription = items.subscribe((itemsValue) => {
+    console.log(itemsValue)
+})
+
+await db.add("items", null, { name: "foo", count: 1 }); // console:  [{ key: 1, value: { name: "foo", count: 1 } }]
+
+subscription.unsubscribe();
+```
+As you can see above **DBObservable** also has **subscribe()** method, but this time the listener will receive the whole table.
+
+Other methods:
+ - **getValue()** - returns table value
+ - **destroy()** - destroys the observable
+
+**IMPORTANT NOTE**
+In sake of performance **DBObservable** stores current state of table, so it can cause memory problems if used with really large tables.
+
+### Utility types
+This section is about utility types
 #### DBTablesName
 Type of DB tables name:
 ```ts
@@ -246,6 +308,7 @@ const db = new DB('db-name', new DBModel({
 
 type Tables = DBTablesName<typeof db>; // "a" | "b"
 ```
+
 
 #### DBTablesType
 Type of DB tables:
