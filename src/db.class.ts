@@ -65,6 +65,16 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
      * 
      * @param table Table name
      * @param key Item key
+     * @returns true if item with such key exists else returns false
+     */
+    async has<K extends keyof Model['tables']>(table: K, key: TableKey<Model, K>): Promise<boolean> {
+        return !!(await this.get(table, key))
+    }
+
+    /**
+     * 
+     * @param table Table name
+     * @param key Item key
      * @param value Item value
      * 
      * @description Tries to add an item to the table with specific key. 
@@ -88,7 +98,7 @@ export class DB<Model extends DBModel<DBModelBasicTables, any>> {
      * @returns count of items in the table
      */
     async count<K extends keyof Model['tables']>(table: K): Promise<number> {
-        const store = await this.getObjectStore(table as string, "readwrite");
+        const store = await this.getObjectStore(table as string, "readonly");
 
         return promisifyRequest(store.count());
     }
