@@ -35,6 +35,12 @@ const db = new DB('test', model);
 
 window['db'] = db;
 
-const obs = new DBObservable(db, "categories");
+const animeItems = new DBObservable(db, "items", () => {
+    return db
+        .getAllBy("items", "category", 2)
+        .then(data => data.map(item => item.value.name))
+});
 
-obs.subscribe(console.log)
+animeItems.subscribe(data => {
+    console.log(`Anime character: ${data.join(", ")}.`)
+})

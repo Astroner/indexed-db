@@ -266,7 +266,7 @@ db.add("b", "foo", 3);     // console:   Table 'b' updated
 **DBObservable** is a class that represents state of specified table. 
 **DBObservable** takes **DB** it should listen to and table name.
 ```ts
-import { DB, DBModel, DBTable, DBObservable } from '@dogonis/db';
+import { DB, DBModel, DBTable, DBColumn, DBObservable } from '@dogonis/db';
 
 const db = new DB('db-name', new DBModel({
     items: new DBTable({
@@ -293,6 +293,22 @@ Other methods:
 
 **IMPORTANT NOTE**
 In sake of performance **DBObservable** stores current state of table, so it can cause memory problems if used with really large tables.
+
+Additionally tou can pass third argument to **DBObservable** **stateFactory** function. 
+This function will produce next state of the observable
+```ts
+import { DB, DBModel, DBTable, DBColumn, DBObservable } from '@dogonis/db';
+
+const db = new DB('db-name', new DBModel({
+    items: new DBTable({
+        name: DBColumn<string, true>(true, true),
+        category: DBColumn<string, true>(true),
+    }),
+}))
+
+const food$ = new DBObservable(db, "items", () => db.getAllBy("items", "category", "food"));
+```
+**food$** observable will listen for updates in **items** table and fetch only items from "food" category.
 
 ### Utility types
 This section is about utility types
