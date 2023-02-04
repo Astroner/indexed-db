@@ -1,4 +1,4 @@
-import { DBModel, DBModelBasicTables } from "./db-model.class";
+import { DBModel } from "./db-model.class";
 import { DBObservable } from "./db-observable.class";
 import { DB } from "./db.class";
 import { TableType } from "./utility-types/table-type";

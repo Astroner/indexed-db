@@ -1,4 +1,4 @@
-import { DB, DBColumn, DBModel, DBObservable, DBObservableType, DBSTable, DBTable, DBTablesName, DBTablesType } from "../src";
+import { DB, DBColumn, DBModel, DBObservable, DBObservableType, DBTable } from "../src";
 
 type Category = "cooking" | "anime";
 
