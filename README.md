@@ -281,7 +281,7 @@ const subscription = items.subscribe((itemsValue) => {
     console.log(itemsValue)
 })
 
-await db.add("items", null, { name: "foo", count: 1 }); // console:  [{ key: 1, value: { name: "foo", count: 1 } }]
+await db.add("items", null, { name: "foo", count: 1 }); // console:  [{ name: "foo", count: 1 }]
 
 subscription.unsubscribe();
 ```

@@ -1,22 +1,22 @@
 import { DBModel, DBModelBasicTables } from "./db-model.class";
 import { DB } from "./db.class";
-import { TableItem } from "./utility-types/table-item";
+import { TableType } from "./utility-types/table-type";
 
 export class DBObservable<Model extends DBModel<DBModelBasicTables, any>, K extends keyof Model['tables']> {
     
-    private value: Promise<TableItem<Model, K>[]>
+    private value: Promise<TableType<Model, K>[]>
 
-    private subs = new Array<(next: TableItem<Model, K>[]) => void>()
+    private subs = new Array<(next: TableType<Model, K>[]) => void>()
 
     private sub: ReturnType<DB<Model>['subscribe']>;
 
     constructor(db: DB<Model>, table: K) {
-        this.value = db.getAllWithKeys(table);
+        this.value = db.getAll(table);
 
         this.sub = db.subscribe(updatedTable => {
             if(updatedTable !== table) return;
 
-            this.value = db.getAllWithKeys(table);
+            this.value = db.getAll(table);
 
             this.update();
         })
@@ -26,7 +26,7 @@ export class DBObservable<Model extends DBModel<DBModelBasicTables, any>, K exte
         return await this.value;
     }
 
-    subscribe(cb: (next: TableItem<Model, K>[]) => void) {
+    subscribe(cb: (next: TableType<Model, K>[]) => void) {
         this.subs.push(cb);
 
         return {
