@@ -11,7 +11,7 @@ export class DBObservable<
     static create<Model extends DBModel<DBModelBasicTables, any>, K extends keyof Model['tables']>(
         db: DB<Model>, 
         table: K
-    ): DBObservable<Model, K, TableType<Model, K>>;
+    ): DBObservable<Model, K, TableType<Model, K>[]>;
     static create<Model extends DBModel<DBModelBasicTables, any>, K extends keyof Model['tables'], DataType>(
         db: DB<Model>, 
         table: K, 
