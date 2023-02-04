@@ -5,16 +5,29 @@ import { TableType } from "./utility-types/table-type";
 export class DBObservable<
     Model extends DBModel<DBModelBasicTables, any>, 
     K extends keyof Model['tables'],
-    DataType extends any = TableType<Model, K>[],
+    DataType,
 > {
+
+    static create<Model extends DBModel<DBModelBasicTables, any>, K extends keyof Model['tables']>(
+        db: DB<Model>, 
+        table: K
+    ): DBObservable<Model, K, TableType<Model, K>>;
+    static create<Model extends DBModel<DBModelBasicTables, any>, K extends keyof Model['tables'], DataType>(
+        db: DB<Model>, 
+        table: K, 
+        stateFactory: () => Promise<DataType>
+    ): DBObservable<Model, K, DataType>
+    static create(db: DB<any>, table: string, stateFactory?: () => Promise<any>) {
+        if(stateFactory) return new DBObservable(db, table, stateFactory);
+        return new DBObservable(db, table, () => db.getAll(table));
+    }
+
     
     private value: Promise<DataType>
 
     private subs = new Array<(next: DataType) => void>()
 
     private sub: ReturnType<DB<Model>['subscribe']>;
-
-    private updateState: () => Promise<DataType>;
     
     /**
      * 
@@ -25,18 +38,14 @@ export class DBObservable<
     constructor(
         db: DB<Model>, 
         table: K,
-        stateFactory?: () => Promise<DataType>
+        private stateFactory: () => Promise<DataType>
     ) {
-        this.updateState = stateFactory ?? (() => {
-            return db.getAll(table) as any;
-        })
-
-        this.value = this.updateState();
+        this.value = this.stateFactory();
 
         this.sub = db.subscribe(updatedTable => {
             if(updatedTable !== table) return;
 
-            this.value = this.updateState();
+            this.value = this.stateFactory();
 
             this.update();
         })

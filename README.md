@@ -20,6 +20,7 @@ This is a simple abstraction over indexedDB based on classes with opportunity to
     - [Utility types](#utility-types)
        - [DBTablesName](#dbtablesname)
        - [DBTablesType](#dbtablestype)
+       - [DBObservableType](#dbobservabletype)
 
 
 # Basics
@@ -264,7 +265,7 @@ db.add("b", "foo", 3);     // console:   Table 'b' updated
 
 #### DBObservable
 **DBObservable** is a class that represents state of specified table. 
-**DBObservable** takes **DB** it should listen to and table name.
+To create **DBObservable** you need to call **DBObservable.create(db, table)**, this function takes **DB** it should listen to and table name.
 ```ts
 import { DB, DBModel, DBTable, DBColumn, DBObservable } from '@dogonis/db';
 
@@ -275,7 +276,7 @@ const db = new DB('db-name', new DBModel({
     }),
 }))
 
-const items$ = new DBObservable(db, "items");
+const items$ = DBObservable.create(db, "items")
 
 const subscription = items.subscribe((itemsValue) => {
     console.log(itemsValue)
@@ -294,7 +295,7 @@ Other methods:
 **IMPORTANT NOTE**
 In sake of performance **DBObservable** stores current state of table, so it can cause memory problems if used with really large tables.
 
-Additionally tou can pass third argument to **DBObservable** **stateFactory** function. 
+Additionally tou can pass third argument to **DBObservable.create** **stateFactory** function. 
 This function will produce next state of the observable
 ```ts
 import { DB, DBModel, DBTable, DBColumn, DBObservable } from '@dogonis/db';
@@ -306,7 +307,7 @@ const db = new DB('db-name', new DBModel({
     }),
 }))
 
-const food$ = new DBObservable(db, "items", () => db.getAllBy("items", "category", "food"));
+const food$ = DBObservable.create(db, "items", () => db.getAllBy("items", "category", "food"));
 ```
 **food$** observable will listen for updates in **items** table and fetch only items from "food" category.
 
@@ -341,4 +342,20 @@ type Types = DBTablesType<typeof db>;
 type AType = Types['a'] // string;
 type BType = Types['b'] // number;
 
+```
+
+
+#### DBObservableType
+Type of **DBObservable**
+```ts
+import { DB, DBModel, DBSTable, DBObservable, DBObservableType } from '@dogonis/db';
+
+const db = new DB('db-name', new DBModel({
+    names: new DBSTable<string>(),
+    numbers: new DBSTable<number>(),
+}))
+
+const names = DBObservable.create(db, "names");
+
+type NamesT = DBObservableType<typeof names>; // string[]
 ```

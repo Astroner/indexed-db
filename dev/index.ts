@@ -1,4 +1,4 @@
-import { DB, DBColumn, DBModel, DBObservable, DBSTable, DBTable, DBTablesName, DBTablesType } from "../src";
+import { DB, DBColumn, DBModel, DBObservable, DBObservableType, DBSTable, DBTable, DBTablesName, DBTablesType } from "../src";
 
 type Category = "cooking" | "anime";
 
@@ -35,12 +35,6 @@ const db = new DB('test', model);
 
 window['db'] = db;
 
-const animeItems = new DBObservable(db, "items", () => {
-    return db
-        .getAllBy("items", "category", 2)
-        .then(data => data.map(item => item.value.name))
-});
+const a = DBObservable.create(db, "categories", () => db.getAllBy("items", "category", 2).then(data => data.map(item => item.value.name)));
 
-animeItems.subscribe(data => {
-    console.log(`Anime character: ${data.join(", ")}.`)
-})
+type A = DBObservableType<typeof a>;
