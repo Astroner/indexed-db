@@ -1,6 +1,6 @@
 {
   "name": "@dogonis/db",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Simple library for indexedDB",
   "main": "lib/index.js",
   "author": "zhenyanikforov@gmail.com",
